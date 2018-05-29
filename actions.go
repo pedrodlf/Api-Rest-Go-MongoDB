@@ -12,15 +12,13 @@ import (
 func PeliculaId(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	idPelicula := params["id"]
-	if !bson.IsObjectIdHex(idPelicula) {
-		w.WriteHeader(404)
-	}
 	oid := bson.ObjectIdHex(idPelicula)
 	var results Pelicula
 	err := Conectar.FindId(oid).One(&results)
 	if err != nil {
 		mostrarEror(err)
 		w.WriteHeader(500)
+		return
 	}
 	ResponsePelicula(w, 200, results)
 }
@@ -51,7 +49,6 @@ func PeliculaUpdate(w http.ResponseWriter, r *http.Request) {
 	idPelicula := params["id"]
 	if !bson.IsObjectIdHex(idPelicula) {
 		w.WriteHeader(404)
-		return
 	}
 	oid := bson.ObjectIdHex(idPelicula)
 	decoder := json.NewDecoder(r.Body)
@@ -60,7 +57,6 @@ func PeliculaUpdate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		mostrarEror(err)
 		w.WriteHeader(500)
-		return
 	}
 	//update
 	document := bson.M{"_id": oid}
@@ -76,9 +72,6 @@ func PeliculaUpdate(w http.ResponseWriter, r *http.Request) {
 func PeliculaDelete(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	idPelicula := params["id"]
-	if !bson.IsObjectIdHex(idPelicula) {
-		w.WriteHeader(404)
-	}
 	oid := bson.ObjectIdHex(idPelicula)
 	// delete
 	err := Conectar.RemoveId(oid)
